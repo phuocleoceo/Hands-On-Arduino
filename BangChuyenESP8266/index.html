@@ -10,22 +10,41 @@
 
 <body>
     <h1>Băng chuyền ESP8266</h1>
-    <div class="sensorValue">
-        Hàng hóa<strong> %STATE%</strong>
+    <div class="sensor">
+        Hàng hóa :<p id="sensorValue"> %SensorValue%</p>
     </div>
+
     <div class="OnOff">
-        <a href="/on"><button class="button buttonOn">Bật</button></a>
-        <a href="/off"><button class="button buttonOff">Tắt</button></a>
+        <button class="button buttonOn" id="On" onclick=handleClick(this)>Bật</button>
+        <button class="button buttonOff" id="Off" onclick=handleClick(this)>Tắt</button>
     </div>
 
     <div class="DirSpeed">
-        <a href="/reverse"><button class="button buttonReverse">Đảo hướng</button></a>
-        <a href="/changeSpeed"><button class="button buttonSpeed">Tốc độ</button></a>
+        <button class="button buttonReverse" id="Reverse" onclick=handleClick(this)>Đảo hướng</button>
+        <button class="button buttonSpeed" id="Speed" onclick=handleClick(this)>Tốc độ</button>
     </div>
 
     <script>
+        function handleClick(element)
+        {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "/update?component=" + element.id, true);
+            xhttp.send();
+        }
 
-
+        setInterval(function ()
+        {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function ()
+            {
+                if (this.readyState == 4 && this.status == 200)
+                {
+                    document.getElementById("sensorValue").innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("GET", "/sensorValue", true);
+            xhttp.send();
+        }, 1000);
     </script>
 </body>
 
