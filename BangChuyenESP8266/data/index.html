@@ -40,7 +40,7 @@
                 if (this.readyState == 4 && this.status == 200)
                 {
                     var responseValue = this.responseText;
-                    if (responseValue == 1)
+                    if (responseValue === "1")
                     {
                         document.getElementById("sensorValue").innerHTML = "Không có";
                     }
