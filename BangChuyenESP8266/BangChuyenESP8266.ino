@@ -49,6 +49,11 @@ void changeDirection()
   dir[1] = !dir[1];
 }
 
+const char* convertChar(int value)
+{
+  return String(value).c_str();  
+}
+
 void setup() 
 {
   // Chân cảm biến
@@ -94,30 +99,15 @@ void setup()
     if (request->hasParam("method")) 
     {
       requestMessage = request->getParam("method")->value();
-      switch(requestMessage)
-      {
-        case "On":
-        {
-          isRunning = true;
-          break;
-        }
-        case "Off":
-        {
-          isRunning = false;
-          break;
-        }
-        case "Reverse":
-        {
-          changeDirection();
-          break;
-        }
-        case "Speed":
-        {
-          changeSpeed();
-          break;
-        }
-        default: { }
-      }
+      if(requestMessage == "On")
+        isRunning = true;
+      else if(requestMessage == "Off")
+        isRunning = false;
+      else if(requestMessage == "Reverse")
+        changeDirection();
+      else if(requestMessage == "Speed")
+        changeSpeed();
+      else {}
     }
     else
       requestMessage = "No request";
@@ -129,7 +119,7 @@ void setup()
   // Server trả về giá trị cảm biến cho Client
   server.on("/sensorValue",HTTP_GET, [](AsyncWebServerRequest *request)
   {
-    request->send(200, "text/plain", sensorValue);
+    request->send(200, "text/plain", convertChar(sensorValue));
   });
 
   server.begin();
