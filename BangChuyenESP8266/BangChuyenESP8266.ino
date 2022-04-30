@@ -1,181 +1,124 @@
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <FS.h>
 
-// Thông tin Wifi
+// Thông số wifi
 const char* ssid = "TripleTruong";
 const char* password = "vidieukhien";
 
-// Tạo đối tượng AsyncWebServer (Server) ở cổng 80
+// Server cổng 80
 AsyncWebServer server(80);
 
-// Tạo đối tượng xử lý sự  kiệnEventSource ở địa chỉ /events
-AsyncEventSource events("/events");
+// Chân digital cảm biến
+int dig = 13;
+// Chân standby
+int STBY = 10; 
 
-// Timer variables
-unsigned long lastTime = 0;  
-unsigned long timerDelay = 30000;
+//MotorA
+int PWMA = 5; // Tốc độ
+int AIN1 = 9; // Hướng
+int AIN2 = 8; // Hướng
+//MotorB
+int PWMB = 6; // Tốc độ
+int BIN1 = 11; // Hướng
+int BIN2 = 12; // Hướng
 
-// Create a sensor object
-Adafruit_BME280 bme; // BME280 connect to ESP32 I2C (GPIO 21 = SDA, GPIO 22 = SCL)
+// Giá trị cảm biến
+int sensorValue = 1;
+// Chạy hay dừng ?
+bool isRunning = false;
+// Tốc độ
+int current_speed = 128;
+// Hướng quay động cơ
+boolean dir[] = {LOW, HIGH};
 
-float temperature;
-float humidity;
-float pressure;
+// Hàm bật tắt băng chuyền
+void changeOnOff()
+{
+  isRunning = !isRunning;
+}
 
-// Init BME280
-void initBME(){
-    if (!bme.begin(0x76)) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    while (1);
+// Hàm thay dổi tốc độ
+void changeSpeed()
+{
+  if(current_speed == 128) 
+    current_speed = 255;
+  else 
+    current_speed = 128;
+}
+
+// Hàm thay đổi hướng
+void changeDirection()
+{
+  dir[0] = !dir[0];
+  dir[1] = !dir[1];
+}
+
+void setup() 
+{
+  // Chân cảm biến
+  pinMode(dig, INPUT);
+  // Chân standby
+  pinMode(STBY, OUTPUT);
+  // Chân Motor A
+  pinMode(PWMA, OUTPUT);
+  pinMode(AIN1, OUTPUT);
+  pinMode(AIN2, OUTPUT);
+  // Chân Motor B
+  pinMode(PWMB, OUTPUT);
+  pinMode(BIN1, OUTPUT);
+  pinMode(BIN2, OUTPUT);
+}
+
+void loop() 
+{
+  // Khi không có vật cản thì giá trị digital là 1
+  int sensorValue = digitalRead(dig);  
+  Serial.println(sensorValue);
+
+  if (isRunning)
+  {
+    move(1, current_speed, 0); //motor 1, current_speed, left
+    move(2, current_speed, 1); //motor 2, current_speed, right
+  }
+  else
+  {
+    move(1, 0, 0); //motor 1, 0 speed, left
+    move(2, 0, 1); //motor 2, 0 speed, right
   }
 }
 
-void getSensorReadings(){
-  temperature = bme.readTemperature();
-  // Convert temperature to Fahrenheit
-  //temperature = 1.8 * bme.readTemperature() + 32;
-  humidity = bme.readHumidity();
-  pressure = bme.readPressure()/ 100.0F;
-}
+void move(int motor, int speed, int direction)
+{
+// motor: 1 - motorA , 2 - motorB
+// speed: tốc độ động cơ 0(tắt) -> 255
+// direction: 0 chiều đồng hồ, 1 ngược chiều đồng hồ
 
-// Initialize WiFi
-void initWiFi() {
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(ssid, password);
-    Serial.print("Connecting to WiFi ..");
-    while (WiFi.status() != WL_CONNECTED) {
-        Serial.print('.');
-        delay(1000);
-    }
-    Serial.println(WiFi.localIP());
-}
+  // Vô hiệu hóa chế độ standby
+  digitalWrite(STBY, HIGH); 
 
-String processor(const String& var){
-  getSensorReadings();
-  //Serial.println(var);
-  if(var == "TEMPERATURE"){
-    return String(temperature);
+  // Hướng động cơ
+  boolean inPin1 = dir[0];
+  boolean inPin2 = dir[1];
+  // Hướng động cơ ngược lại
+  if(direction == 1)
+  {
+    inPin1 = dir[1];
+    inPin2 = dir[0];
   }
-  else if(var == "HUMIDITY"){
-    return String(humidity);
+  // Xuất điện áp LOW/HIGH ra 2 chân để quay động cơ
+  // Xuất tốc độ bằng chân PWM
+  if(motor == 1)
+  {
+    digitalWrite(AIN1, inPin1);
+    digitalWrite(AIN2, inPin2);
+    analogWrite(PWMA, speed);
   }
-  else if(var == "PRESSURE"){
-    return String(pressure);
-  }
-  return String();
-}
-
-const char index_html[] PROGMEM = R"rawliteral(
-<!DOCTYPE HTML><html>
-<head>
-  <title>ESP Web Server</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-  <link rel="icon" href="data:,">
-  <style>
-    html {font-family: Arial; display: inline-block; text-align: center;}
-    p { font-size: 1.2rem;}
-    body {  margin: 0;}
-    .topnav { overflow: hidden; background-color: #50B8B4; color: white; font-size: 1rem; }
-    .content { padding: 20px; }
-    .card { background-color: white; box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5); }
-    .cards { max-width: 800px; margin: 0 auto; display: grid; grid-gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-    .reading { font-size: 1.4rem; }
-  </style>
-</head>
-<body>
-  <div class="topnav">
-    <h1>BME280 WEB SERVER (SSE)</h1>
-  </div>
-  <div class="content">
-    <div class="cards">
-      <div class="card">
-        <p><i class="fas fa-thermometer-half" style="color:#059e8a;"></i> TEMPERATURE</p><p><span class="reading"><span id="temp">%TEMPERATURE%</span> &deg;C</span></p>
-      </div>
-      <div class="card">
-        <p><i class="fas fa-tint" style="color:#00add6;"></i> HUMIDITY</p><p><span class="reading"><span id="hum">%HUMIDITY%</span> &percnt;</span></p>
-      </div>
-      <div class="card">
-        <p><i class="fas fa-angle-double-down" style="color:#e1e437;"></i> PRESSURE</p><p><span class="reading"><span id="pres">%PRESSURE%</span> hPa</span></p>
-      </div>
-    </div>
-  </div>
-<script>
-if (!!window.EventSource) {
- var source = new EventSource('/events');
- 
- source.addEventListener('open', function(e) {
-  console.log("Events Connected");
- }, false);
- source.addEventListener('error', function(e) {
-  if (e.target.readyState != EventSource.OPEN) {
-    console.log("Events Disconnected");
-  }
- }, false);
- 
- source.addEventListener('message', function(e) {
-  console.log("message", e.data);
- }, false);
- 
- source.addEventListener('temperature', function(e) {
-  console.log("temperature", e.data);
-  document.getElementById("temp").innerHTML = e.data;
- }, false);
- 
- source.addEventListener('humidity', function(e) {
-  console.log("humidity", e.data);
-  document.getElementById("hum").innerHTML = e.data;
- }, false);
- 
- source.addEventListener('pressure', function(e) {
-  console.log("pressure", e.data);
-  document.getElementById("pres").innerHTML = e.data;
- }, false);
-}
-</script>
-</body>
-</html>)rawliteral";
-
-void setup() {
-  Serial.begin(115200);
-  initWiFi();
-  initBME();
-
-
-  // Handle Web Server
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", index_html, processor);
-  });
-
-  // Handle Web Server Events
-  events.onConnect([](AsyncEventSourceClient *client){
-    if(client->lastId()){
-      Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
-    }
-    // send event with message "hello!", id current millis
-    // and set reconnect delay to 1 second
-    client->send("hello!", NULL, millis(), 10000);
-  });
-  server.addHandler(&events);
-  server.begin();
-}
-
-void loop() {
-  if ((millis() - lastTime) > timerDelay) {
-    getSensorReadings();
-    Serial.printf("Temperature = %.2f ºC \n", temperature);
-    Serial.printf("Humidity = %.2f \n", humidity);
-    Serial.printf("Pressure = %.2f hPa \n", pressure);
-    Serial.println();
-
-    // Send Events to the Web Server with the Sensor Readings
-    events.send("ping",NULL,millis());
-    events.send(String(temperature).c_str(),"temperature",millis());
-    events.send(String(humidity).c_str(),"humidity",millis());
-    events.send(String(pressure).c_str(),"pressure",millis());
-    
-    lastTime = millis();
+  else
+  {
+    digitalWrite(BIN1, inPin1);
+    digitalWrite(BIN2, inPin2);
+    analogWrite(PWMB, speed);
   }
 }
-1
