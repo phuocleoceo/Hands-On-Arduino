@@ -11,7 +11,7 @@
 <body>
     <h1>Băng chuyền ESP8266</h1>
     <div class="sensor">
-        Hàng hóa :<p id="sensorValue"> %SensorValue%</p>
+        Hàng hóa : <p id="sensorValue">%SensorValue%</p>
     </div>
 
     <div class="OnOff">
@@ -28,7 +28,7 @@
         function handleClick(element)
         {
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/update?component=" + element.id, true);
+            xhttp.open("GET", "/update?method=" + element.id, true);
             xhttp.send();
         }
 

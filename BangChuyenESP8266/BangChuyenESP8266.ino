@@ -33,12 +33,6 @@ int current_speed = 128;
 // Hướng quay động cơ
 boolean dir[] = {LOW, HIGH};
 
-// Hàm bật tắt băng chuyền
-void changeOnOff()
-{
-  isRunning = !isRunning;
-}
-
 // Hàm thay dổi tốc độ
 void changeSpeed()
 {
@@ -69,13 +63,76 @@ void setup()
   pinMode(PWMB, OUTPUT);
   pinMode(BIN1, OUTPUT);
   pinMode(BIN2, OUTPUT);
+
+  if(!SPIFFS.begin()){
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
+  }
+  
+  Serial.print("Setting connect...");
+  WiFi.softAP(ssid, password);
+  
+  // Mở server, dùng file html để hiển thị
+  server.on("/",HTTP_GET, [](AsyncWebServerRequest *request)
+  {
+    request->send(SPIFFS, "/index.html");
+  });
+
+  // Server lắng nghe sự kiện
+  server.on("/update",HTTP_GET, [](AsyncWebServerRequest *request)
+  {
+    String requestMessage;
+    if (request->hasParam("method")) 
+    {
+      requestMessage = request->getParam("method")->value();
+      switch(requestMessage)
+      {
+        case "On":
+        {
+          isRunning = true;
+          break;
+        }
+        case "Off":
+        {
+          isRunning = false;
+          break;
+        }
+        case "Reverse":
+        {
+          changeDirection();
+          break;
+        }
+        case "Speed":
+        {
+          changeSpeed();
+          break;
+        }
+        default: { }
+      }
+    }
+    else
+      requestMessage = "No request";
+    Serial.println(requestMessage);
+    request->send(200, "text/plain", "OK");
+  });
+
+  // Server trả về giá trị cảm biến cho Client
+  server.on("/sensorValue",HTTP_GET, [](AsyncWebServerRequest *request)
+  {
+    request->send(200, "text/plain", sensorValue);
+  });
+
+  server.begin();
+  Serial.println("Server started !");
+  
+  Serial.print("Sorf-AP IP Address : ");
+  Serial.println(WiFi.softAPIP());
 }
 
 void loop() 
 {
   // Khi không có vật cản thì giá trị digital là 1
-  int sensorValue = digitalRead(dig);  
-  Serial.println(sensorValue);
+  int sensorValue = digitalRead(dig);
 
   if (isRunning)
   {
