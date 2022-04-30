@@ -1,0 +1,46 @@
+html {
+    font-family: Arial;
+    display: inline-block;
+    text-align: center;
+    margin: 0px auto;
+}
+
+h1 {
+    color: #0F3376;
+}
+
+.sensorValue {
+    font-size: 1.5rem;
+    margin: 15px;
+}
+
+.button {
+    display: inline-block;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 30px;
+    border-radius: 10px;
+    border: none;
+    margin: 5px;
+}
+
+.buttonOn {
+    background-color: #008CBA;
+    padding: 15px 50px;
+}
+
+.buttonOff {
+    background-color: #f44336;
+    padding: 15px 50px;
+}
+
+.buttonReverse {
+    background-color: #aeba00;
+    padding: 15px 20px;
+}
+
+.buttonSpeed {
+    background-color: #f436a5;
+    padding: 15px 20px;
+}
