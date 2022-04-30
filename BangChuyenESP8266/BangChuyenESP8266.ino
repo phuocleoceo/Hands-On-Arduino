@@ -142,7 +142,7 @@ void setup()
 void loop() 
 {
   // Khi không có vật cản thì giá trị digital là 1
-  int sensorValue = digitalRead(dig);
+  sensorValue = digitalRead(dig);
 
   if (isRunning)
   {
