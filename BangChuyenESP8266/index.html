@@ -39,7 +39,15 @@
             {
                 if (this.readyState == 4 && this.status == 200)
                 {
-                    document.getElementById("sensorValue").innerHTML = this.responseText;
+                    var responseValue = this.responseText;
+                    if (responseValue == 1)
+                    {
+                        document.getElementById("sensorValue").innerHTML = "Không có";
+                    }
+                    else
+                    {
+                        document.getElementById("sensorValue").innerHTML = "Có";
+                    }
                 }
             };
             xhttp.open("GET", "/sensorValue", true);

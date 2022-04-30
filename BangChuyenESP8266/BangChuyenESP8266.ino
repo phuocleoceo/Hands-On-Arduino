@@ -64,18 +64,27 @@ void setup()
   pinMode(BIN1, OUTPUT);
   pinMode(BIN2, OUTPUT);
 
-  if(!SPIFFS.begin()){
+  // Check xem SPIFFS có nạp được file html, css hay không
+  if(!SPIFFS.begin())
+  {
     Serial.println("An Error has occurred while mounting SPIFFS");
     return;
   }
   
+  // Tạo kết nối
   Serial.print("Setting connect...");
   WiFi.softAP(ssid, password);
   
-  // Mở server, dùng file html để hiển thị
+  // Server dùng file html để hiển thị
   server.on("/",HTTP_GET, [](AsyncWebServerRequest *request)
   {
     request->send(SPIFFS, "/index.html");
+  });
+
+  // Server dùng file css để tạo style
+  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request)
+  {
+    request->send(SPIFFS, "/style.css", "text/css");
   });
 
   // Server lắng nghe sự kiện
@@ -112,6 +121,7 @@ void setup()
     }
     else
       requestMessage = "No request";
+
     Serial.println(requestMessage);
     request->send(200, "text/plain", "OK");
   });
