@@ -31,6 +31,15 @@ h1 {
     margin: 5px;
     margin-top: 20px;
     width: 200px;
+
+    padding: 10px;
+    font-size: 25px;
+    box-shadow: 5px 5px 5px rgba(128, 128, 128, 0.383);
+}
+
+.button:active {
+    background-color: #58257b;
+    transform: translateY(4px);
 }
 
 .buttonOn {
