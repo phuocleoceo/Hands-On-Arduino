@@ -11,18 +11,18 @@ const char* password = "vidieukhien";
 AsyncWebServer server(80);
 
 // Chân digital cảm biến
-int dig = 13;
+int dig = 8;
 // Chân standby
-int STBY = 10; 
+int STBY = 3; 
 
 //MotorA
-int PWMA = 5; // Tốc độ
-int AIN1 = 9; // Hướng
-int AIN2 = 8; // Hướng
+int PWMA = 0; // Tốc độ
+int AIN1 = 1; // Hướng
+int AIN2 = 2; // Hướng
 //MotorB
-int PWMB = 6; // Tốc độ
-int BIN1 = 11; // Hướng
-int BIN2 = 12; // Hướng
+int PWMB = 5; // Tốc độ
+int BIN1 = 6; // Hướng
+int BIN2 = 7; // Hướng
 
 // Giá trị cảm biến
 int sensorValue = 1;
