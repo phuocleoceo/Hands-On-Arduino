@@ -24,14 +24,31 @@
         <button class="button buttonSpeed" id="Speed" onclick=handleClick(this)>Tốc độ</button>
     </div>
 
+    <div class="slidecontainer">
+        <label>Tốc độ : </label>
+        <span id="currentSpeed"></span>
+        <input type="range" min="0" max="255" value="128" class="slider" id="speedRange">
+    </div>
     <script>
+        var slider = document.getElementById("speedRange");
+        var output = document.getElementById("currentSpeed");
+        output.innerHTML = slider.value;
+
+        // Cap nhat lai gia tri Speed
+        slider.oninput = function ()
+        {
+            output.innerHTML = this.value;
+        }
+
+        // Xu ly su kien nhan nut
         function handleClick(element)
         {
             var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/update?method=" + element.id, true);
+            xhttp.open("GET", "/control?method=" + element.id + "&speed=" + slider.value, true);
             xhttp.send();
         }
 
+        // Cap nhat gia tri cam bien
         setInterval(function ()
         {
             var xhttp = new XMLHttpRequest();

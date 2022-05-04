@@ -34,12 +34,9 @@ int current_speed = 128;
 boolean dir[] = {LOW, HIGH};
 
 // Hàm thay dổi tốc độ
-void changeSpeed()
+void changeSpeed(int newSpeed)
 {
-  if(current_speed == 128) 
-    current_speed = 255;
-  else 
-    current_speed = 128;
+  current_speed = newSpeed;
 }
 
 // Hàm thay đổi hướng
@@ -93,7 +90,7 @@ void setup()
   });
 
   // Server lắng nghe sự kiện
-  server.on("/update",HTTP_GET, [](AsyncWebServerRequest *request)
+  server.on("/control",HTTP_GET, [](AsyncWebServerRequest *request)
   {
     String requestMessage;
     if (request->hasParam("method")) 
@@ -105,8 +102,10 @@ void setup()
         isRunning = false;
       else if(requestMessage == "Reverse")
         changeDirection();
-      else if(requestMessage == "Speed")
-        changeSpeed();
+      else if(requestMessage == "Speed"){
+        String requestSpeed = request->getParam("speed")->value();
+        changeSpeed(requestSpeed.toInt());     
+      }        
       else {}
     }
     else
