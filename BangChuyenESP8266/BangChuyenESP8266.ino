@@ -11,7 +11,7 @@ const char* password = "vidieukhien";
 AsyncWebServer server(80);
 
 // Chân digital cảm biến
-int dig = D8;
+int dig = D4;
 // Chân standby
 int STBY = D3; 
 
@@ -33,13 +33,17 @@ int current_speed = 128;
 // Hướng quay động cơ
 boolean dir[] = {LOW, HIGH};
 
-const char* convertChar(int value)
+String convertSensor(int value)
 {
-  return String(value).c_str();  
+  if(value==1)
+    return "Không";
+  else
+    return "Có";
 }
 
 void setup() 
 {
+  Serial.begin(9600);
   // Chân cảm biến
   pinMode(dig, INPUT);
   // Chân standby
@@ -109,7 +113,7 @@ void setup()
   // Server trả về giá trị cảm biến cho Client
   server.on("/sensorValue",HTTP_GET, [](AsyncWebServerRequest *request)
   {
-    request->send(200, "text/plain", convertChar(sensorValue));
+    request->send(200, "text/plain", convertSensor(sensorValue).c_str());
   });
 
   server.begin();
