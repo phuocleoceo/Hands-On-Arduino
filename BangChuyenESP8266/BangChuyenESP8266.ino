@@ -33,19 +33,6 @@ int current_speed = 128;
 // Hướng quay động cơ
 boolean dir[] = {LOW, HIGH};
 
-// Hàm thay dổi tốc độ
-void changeSpeed(int newSpeed)
-{
-  current_speed = newSpeed;
-}
-
-// Hàm thay đổi hướng
-void changeDirection()
-{
-  dir[0] = !dir[0];
-  dir[1] = !dir[1];
-}
-
 const char* convertChar(int value)
 {
   return String(value).c_str();  
@@ -100,11 +87,15 @@ void setup()
         isRunning = true;
       else if(requestMessage == "Off")
         isRunning = false;
-      else if(requestMessage == "Reverse")
-        changeDirection();
+      else if(requestMessage == "Reverse"){
+        // Thay đổi hướng
+        dir[0] = !dir[0];
+        dir[1] = !dir[1];
+      }
       else if(requestMessage == "Speed"){
+        // Thay đổi tốc độ
         String requestSpeed = request->getParam("speed")->value();
-        changeSpeed(requestSpeed.toInt());     
+        current_speed = requestSpeed.toInt(); 
       }        
       else {}
     }
