@@ -7,7 +7,7 @@ Stepper stepper_motor(steps_1_cycle, 8, 9, 10, 11);
 // Chân digital cảm biến
 int dig = 13;
 
-// Chế độ tự động - dùng cảm biến (true:mở, false:đóng)
+// Chế độ tự động - dùng cảm biến
 bool isAutoMode = true;
 
 // Nút nhấn ở ngắt số 2

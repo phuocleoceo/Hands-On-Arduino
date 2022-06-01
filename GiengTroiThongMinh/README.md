@@ -11,3 +11,4 @@ Nút bấm
 ![image](./LapMach.png)
 
 ## Video Demo
+https://youtu.be/HStiE6TRT9A
