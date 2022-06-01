@@ -7,16 +7,52 @@ Stepper stepper_motor(steps_1_cycle, 8, 9, 10, 11);
 // Chân digital cảm biến
 int dig = 13;
 
+// Chế độ tự động - dùng cảm biến (true:mở, false:đóng)
+bool isAutoMode = true;
+
 // Trạng thái của giếng trời (true:mở, false:đóng)
 bool SkyLightStatus = true;
-// Số vòng mà ta muốn động cơ bước quay
-int rotation = 3*steps_1_cycle;
 
-void closeSkyLight() {
+// Số vòng mà ta muốn động cơ bước quay
+int rotation = steps_1_cycle/2;
+
+// Hàm thay đổi chế độ tự động - thủ công
+int lastPressMode = 0;
+void changeMode()
+{
+  if(millis()-lastPressMode > 1000)
+  {    
+    isAutoMode = !isAutoMode;
+    Serial.print(">> Che do : ");
+    Serial.println(isAutoMode);
+  }
+  lastPressMode = millis();
+}
+
+// Hàm mở-đóng giếng trời thủ công
+int lastPressOnOff = 0;
+void changeOnOff()
+{
+  if(millis()-lastPressOnOff > 1000)
+  {    
+    Serial.print(">> Trang thai : ");
+    Serial.println(SkyLightStatus);
+//    if(SkyLightStatus)
+//      closeSkyLight();
+//    else
+//      openSkyLight();
+    closeSkyLight();
+  }
+  lastPressOnOff = millis();
+}
+
+void closeSkyLight() 
+{
   SkyLightStatus = false;
   stepper_motor.step(rotation);
 }
-void openSkyLight() {
+void openSkyLight() 
+{
   SkyLightStatus = true;
   stepper_motor.step(-1*rotation);
 }
@@ -26,7 +62,14 @@ void setup()
   Serial.begin(9600);
   // Chân cảm biến
   pinMode(dig, INPUT);
-  // Toc do dong co buoc
+  // Chân ngắt
+  pinMode(2, INPUT_PULLUP);
+  attachInterrupt(0, changeOnOff, RISING);
+  
+  pinMode(3, INPUT_PULLUP);
+  attachInterrupt(1, changeMode, RISING);
+  
+  // Tốc độ động cơ bước
   stepper_motor.setSpeed(120);
 }
 
@@ -35,16 +78,22 @@ void loop()
 {
   // Khi không có mưa thì giá trị digital là 1
   int sensorValue = digitalRead(dig);
-  Serial.println(sensorValue);
-  if(sensorValue==1 && lastSensorValue==0)
+  //Serial.println(sensorValue);
+
+  // Chế độ tự động - Điều khiển bằng cảm biến
+  if(isAutoMode)
   {
-    openSkyLight();
+      if(sensorValue==1 && lastSensorValue==0)
+      {
+        openSkyLight();
+      }
+      else if(sensorValue==0 && lastSensorValue==1)
+      {
+        closeSkyLight();
+      }
+      else{  }
   }
-  else if(sensorValue==0 && lastSensorValue==1)
-  {
-    closeSkyLight();
-  }
-  else{  }
+  
   lastSensorValue = sensorValue;
   delay(300);
 }
