@@ -10,8 +10,8 @@ int dig = 13;
 // Chế độ tự động - dùng cảm biến (true:mở, false:đóng)
 bool isAutoMode = true;
 
-// Trạng thái của giếng trời (true:mở, false:đóng)
-bool SkyLightStatus = true;
+// Nút nhấn ở ngắt số 2
+bool isButtonPressed = false;
 
 // Số vòng mà ta muốn động cơ bước quay
 int rotation = steps_1_cycle/2;
@@ -35,25 +35,22 @@ void changeOnOff()
 {
   if(millis()-lastPressOnOff > 1000)
   {    
-    Serial.print(">> Trang thai : ");
-    Serial.println(SkyLightStatus);
-//    if(SkyLightStatus)
-//      closeSkyLight();
-//    else
-//      openSkyLight();
-    closeSkyLight();
+    // Chỉ điều khiển thủ công được khi đang ở chế độ thủ công
+    if(!isAutoMode)
+    {
+     isButtonPressed = true; 
+    }
   }
   lastPressOnOff = millis();
 }
 
 void closeSkyLight() 
 {
-  SkyLightStatus = false;
   stepper_motor.step(rotation);
 }
+
 void openSkyLight() 
 {
-  SkyLightStatus = true;
   stepper_motor.step(-1*rotation);
 }
 
@@ -93,7 +90,13 @@ void loop()
       }
       else{  }
   }
+  else
+  {
+      if(isButtonPressed)
+        openSkyLight();
+  }
   
   lastSensorValue = sensorValue;
+  isButtonPressed = false;
   delay(300);
 }
