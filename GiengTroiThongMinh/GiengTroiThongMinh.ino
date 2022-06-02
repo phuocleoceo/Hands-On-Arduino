@@ -1,5 +1,6 @@
 #include <Stepper.h>
 
+int stepper_speed = 120;
 // Số bước để hoàn thành 1 chu kỳ quay (1 vòng quay)
 int steps_1_cycle = 200;
 Stepper stepper_motor(steps_1_cycle, 8, 9, 10, 11);   
@@ -24,7 +25,10 @@ void changeMode()
   {    
     isAutoMode = !isAutoMode;
     Serial.print(">> Che do : ");
-    Serial.println(isAutoMode);
+    if(isAutoMode)
+      Serial.println("Tu dong");
+    else
+      Serial.println("Thu cong");
   }
   lastPressMode = millis();
 }
@@ -67,7 +71,7 @@ void setup()
   attachInterrupt(1, changeMode, RISING);
   
   // Tốc độ động cơ bước
-  stepper_motor.setSpeed(120);
+  stepper_motor.setSpeed(stepper_speed);
 }
 
 int lastSensorValue = 1;
@@ -75,17 +79,26 @@ void loop()
 {
   // Khi không có mưa thì giá trị digital là 1
   int sensorValue = digitalRead(dig);
-  //Serial.println(sensorValue);
 
   // Chế độ tự động - Điều khiển bằng cảm biến
   if(isAutoMode)
   {
+      Serial.print(">> Mua : ");
+      if(sensorValue==1)
+        Serial.println("Khong");
+      else
+        Serial.println("Co");
+        
       if(sensorValue==1 && lastSensorValue==0)
       {
+        Serial.print(">> Mo gieng troi, Toc do : ");
+        Serial.println(stepper_speed);
         openSkyLight();
       }
       else if(sensorValue==0 && lastSensorValue==1)
       {
+        Serial.print(">> Dong gieng troi, Toc do : ");
+        Serial.println(stepper_speed);
         closeSkyLight();
       }
       else{  }
@@ -93,7 +106,11 @@ void loop()
   else
   {
       if(isButtonPressed)
+      {
+        Serial.print(">> Dong mo gieng troi thu cong, Toc do :");
+        Serial.println(stepper_speed);
         openSkyLight();
+      }
   }
   
   lastSensorValue = sensorValue;
