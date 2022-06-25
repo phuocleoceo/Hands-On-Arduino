@@ -13,7 +13,7 @@ int buttonHandControl = 9;
 int buttonDecreaseSpeed = 10;
 int buttonIncreaseSpeed = 11;
 
-int debounceDelay = 500; 
+int debounceDelay = 1000; 
 // Thời gian gần nhất nút nhấn được sử dụng
 int lastModePress = 0;
 int lastHandControlPress = 0;
