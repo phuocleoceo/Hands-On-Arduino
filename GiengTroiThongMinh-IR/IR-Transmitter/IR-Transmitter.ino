@@ -54,7 +54,7 @@ void loop()
 
   if ((millis()-lastModePress > debounceDelay) && (modeStatus != lastModeStatus)) 
   {
-    lcdContent = "Chuyen che do";
+    lcdContent = "Chuyen che do   ";
     irsend.sendSony(0xa90, 12);
     lastModePress = millis();
   }
