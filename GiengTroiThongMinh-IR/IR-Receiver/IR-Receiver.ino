@@ -73,7 +73,7 @@ void decreaseSpeed()
 void increaseSpeed()
 {
   stepper_speed = stepper_speed + 20;
-  Serial.print("Tang toc do");
+  Serial.print("Tang toc do : ");
   Serial.println(stepper_speed);
   stepper_motor.setSpeed(stepper_speed);
 }
