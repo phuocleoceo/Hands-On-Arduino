@@ -1,3 +1,8 @@
+#include <IRremote.h>
+#include <IRremoteInt.h>
+
+IRsend irsend;
+
 // Các chân kết nối của 4 nút nhấn
 int buttonMode = 8;
 int buttonHandControl = 9;
@@ -40,24 +45,28 @@ void loop()
   if ((millis()-lastModePress > debounceDelay) && (modeStatus != lastModeStatus)) 
   {
     Serial.println("Chuyen che do");
+    irsend.sendSony(0xa90, 12);
     lastModePress = millis();
   }
 
   if ((millis()-lastHandControlPress > debounceDelay) && (handControlStatus != lastHandControlStatus)) 
   {
     Serial.println("Dieu khien bang tay");
+    irsend.sendSony(0xa91, 12);
     lastHandControlPress = millis();
   }
 
   if ((millis()-lastDecreaseSpeedPress > debounceDelay) && (decreaseSpeedStatus != lastDecreaseSpeedStatus)) 
   {
     Serial.println("Giam toc do");
+    irsend.sendSony(0xa92, 12);
     lastDecreaseSpeedPress = millis();
   }
 
   if ((millis()-lastIncreaseSpeedPress > debounceDelay) && (increaseSpeedStatus != lastIncreaseSpeedStatus)) 
   {
     Serial.println("Tang toc do");
+    irsend.sendSony(0xa93, 12);
     lastIncreaseSpeedPress = millis();
   }
 
