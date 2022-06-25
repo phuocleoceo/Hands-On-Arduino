@@ -4,6 +4,19 @@ int buttonHandControl = 9;
 int buttonDecreaseSpeed = 10;
 int buttonIncreaseSpeed = 11;
 
+int debounceDelay = 500; 
+// Thời gian gần nhất nút nhấn được sử dụng
+int lastModePress = 0;
+int lastHandControlPress = 0;
+int lastDecreaseSpeedPress = 0;
+int lastIncreaseSpeedPress = 0;
+
+// Lưu lại giá trị gần nhất của nút nhấn
+int lastModeStatus = HIGH;
+int lastHandControlStatus = HIGH;
+int lastDecreaseSpeedStatus = HIGH;
+int lastIncreaseSpeedStatus = HIGH;
+
 void setup() 
 {
   Serial.begin(9600);
@@ -13,12 +26,6 @@ void setup()
   pinMode(buttonDecreaseSpeed, INPUT_PULLUP);
   pinMode(buttonIncreaseSpeed, INPUT_PULLUP);
 }
-
-// Lưu lại giá trị gần nhất của nút nhấn
-int lastModeStatus = HIGH;
-int lastHandControlStatus = HIGH;
-int lastDecreaseSpeedStatus = HIGH;
-int lastIncreaseSpeedStatus = HIGH;
 
 void loop() 
 {
@@ -30,24 +37,28 @@ void loop()
   // Nếu trạng thái của nút nhấn giữa giá trị vừa đọc được 
   // với giá trị gần nhất khác nhau thì thực hiện câu lệnh
 
-  if (modeStatus != lastModeStatus) 
+  if ((millis()-lastModePress > debounceDelay) && (modeStatus != lastModeStatus)) 
   {
     Serial.println("Chuyen che do");
+    lastModePress = millis();
   }
 
-  if (handControlStatus != lastHandControlStatus) 
+  if ((millis()-lastHandControlPress > debounceDelay) && (handControlStatus != lastHandControlStatus)) 
   {
     Serial.println("Dieu khien bang tay");
+    lastHandControlPress = millis();
   }
 
-  if (decreaseSpeedStatus != lastDecreaseSpeedStatus) 
+  if ((millis()-lastDecreaseSpeedPress > debounceDelay) && (decreaseSpeedStatus != lastDecreaseSpeedStatus)) 
   {
     Serial.println("Giam toc do");
+    lastDecreaseSpeedPress = millis();
   }
 
-  if (increaseSpeedStatus != lastIncreaseSpeedStatus) 
+  if ((millis()-lastIncreaseSpeedPress > debounceDelay) && (increaseSpeedStatus != lastIncreaseSpeedStatus)) 
   {
     Serial.println("Tang toc do");
+    lastIncreaseSpeedPress = millis();
   }
 
   // Cập nhật lại giá trị mới nhất của nút nhấn
