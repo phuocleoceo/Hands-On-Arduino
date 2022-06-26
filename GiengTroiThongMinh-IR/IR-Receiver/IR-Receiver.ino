@@ -9,7 +9,7 @@ IRrecv irrecv(RECV_PIN);
 decode_results results;
 
 // Tốc độ ban đầu
-int stepper_speed = 120;
+int stepper_speed = 100;
 // Số bước để hoàn thành 1 chu kỳ quay (1 vòng quay)
 int steps_1_cycle = 200;
 
@@ -56,7 +56,7 @@ void manualControl()
   {
     Serial.print(">> Dong mo gieng troi thu cong, Toc do :");
     Serial.println(stepper_speed);
-    stepper_motor.step(rotation+3);
+    stepper_motor.step(rotation);
   }     
 }
 
