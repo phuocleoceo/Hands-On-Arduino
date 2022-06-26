@@ -56,7 +56,7 @@ void manualControl()
   {
     Serial.print(">> Dong mo gieng troi thu cong, Toc do :");
     Serial.println(stepper_speed);
-    openSkyLight();
+    stepper_motor.step(rotation+3);
   }     
 }
 

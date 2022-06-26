@@ -1,9 +1,5 @@
 #include <IRremote.h>
 #include <IRremoteInt.h>
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
-
-LiquidCrystal_I2C lcd(0x27,16,2);
 
 IRsend irsend;
 
@@ -26,20 +22,14 @@ int lastHandControlStatus = HIGH;
 int lastDecreaseSpeedStatus = HIGH;
 int lastIncreaseSpeedStatus = HIGH;
 
-// Nội dung in ra LCD
-String lcdContent = "Xin chao";
-
 void setup() 
 {
-  // Serial.begin(9600);
+  Serial.begin(9600);
   // Cài đặt chế độ cho 4 nút nhấn luôn ở mức điện áp cao
   pinMode(buttonMode, INPUT_PULLUP);
   pinMode(buttonHandControl, INPUT_PULLUP);
   pinMode(buttonDecreaseSpeed, INPUT_PULLUP);
   pinMode(buttonIncreaseSpeed, INPUT_PULLUP);
-  // Khởi tạo màn hình LCD
-  lcd.init();  
-  lcd.backlight(); 
 }
 
 void loop() 
@@ -54,28 +44,28 @@ void loop()
 
   if ((millis()-lastModePress > debounceDelay) && (modeStatus != lastModeStatus)) 
   {
-    lcdContent = "Chuyen che do   ";
+    Serial.println("Chuyen che do");
     irsend.sendSony(0xa90, 12);
     lastModePress = millis();
   }
 
   if ((millis()-lastHandControlPress > debounceDelay) && (handControlStatus != lastHandControlStatus)) 
   {
-    lcdContent = "DK bang tay     ";
+    Serial.println("DK bang tay");
     irsend.sendSony(0xa91, 12);
     lastHandControlPress = millis();
   }
 
   if ((millis()-lastDecreaseSpeedPress > debounceDelay) && (decreaseSpeedStatus != lastDecreaseSpeedStatus)) 
   {
-    lcdContent = "Giam toc do     ";
+    Serial.println("Giam toc do");
     irsend.sendSony(0xa92, 12);
     lastDecreaseSpeedPress = millis();
   }
 
   if ((millis()-lastIncreaseSpeedPress > debounceDelay) && (increaseSpeedStatus != lastIncreaseSpeedStatus)) 
   {
-    lcdContent = "Tang toc do     ";
+    Serial.println("Tang toc do");
     irsend.sendSony(0xa93, 12);
     lastIncreaseSpeedPress = millis();
   }
@@ -85,8 +75,4 @@ void loop()
   lastHandControlStatus = lastHandControlStatus;
   lastHandControlStatus = lastDecreaseSpeedStatus;
   lastIncreaseSpeedStatus = lastIncreaseSpeedStatus;
-
-  // Hiển thị ra LCD
-  lcd.setCursor(0,0);
-  lcd.print(lcdContent);
 }
