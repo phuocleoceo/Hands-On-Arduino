@@ -4,15 +4,15 @@
 Giếng trời thông minh là một hệ thống mái che tự động, được tạo ra nhằm mục đích che chắn khu giếng trời, hay còn gọi là thông tầng. Với mục đích để lấy gió, ánh sáng một cách chủ động và có thể điều khiển từ xa thông qua hồng ngoại, điện thoại di động, ...
 
 ## Linh kiện sử dụng
-Arduino UNO R3 : 2 cái
-Breadboard : 2 cái
-Module phát hồng ngoại Ky-005 (1 - 2m) : 1 cái
-Module thu hồng ngoại Ky-022 (15m) : 1 cái
-Module điều khiển động cơ L298N : 1 cái
-Động cơ bước (1.8 độ) : 1 cái
-Cảm biến mưa : 1 cái
-Pin 9V : 1 cái
-Nút bấm : 4 cái
+Arduino UNO R3 : 2 cái\
+Breadboard : 2 cái\
+Module phát hồng ngoại Ky-005 (1 - 2m) : 1 cái\
+Module thu hồng ngoại Ky-022 (15m) : 1 cái\
+Module điều khiển động cơ L298N : 1 cái\
+Động cơ bước (1.8 độ) : 1 cái\
+Cảm biến mưa : 1 cái\
+Pin 9V : 1 cái\
+Nút bấm : 4 cái\
 Dây nối
 
 ## Nguyên lý hoạt động
